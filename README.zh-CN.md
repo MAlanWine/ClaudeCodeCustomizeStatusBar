@@ -5,7 +5,7 @@
 一个自定义的 [Claude Code](https://claude.com/claude-code) 底部状态栏，显示当前模型、思考强度，以及订阅套餐的 5 小时与每周限额用量（带进度条和重置倒计时）。
 
 ```
-Opus 5.5 · ⚡high · 5h ▕███     ▏ 37% ↻ 2h01m · week ▕██████▌ ▏ 82% ↻ 3d18h
+Opus 5.5 · ⚡high · ctx 45.2k/167k(200k) · 5h ▕███     ▏ 37% ↻ 2h01m · week ▕██████▌ ▏ 82% ↻ 3d18h
 ```
 
 ## 显示内容
@@ -14,11 +14,13 @@ Opus 5.5 · ⚡high · 5h ▕███     ▏ 37% ↻ 2h01m · week ▕██�
 | --- | --- |
 | 模型 | 当前使用的模型名称，如 `Opus 5.5` |
 | 思考强度 | 当前的 effort 等级，如 `⚡high`；关闭思考时显示 `thinking off`，没有等级时显示 `default` |
+| `ctx` | 上下文占用，格式为 `已用/自动压缩阈值(上下文总量)`，如 `45.2k/167k(200k)`；关闭自动压缩时中间显示 `off` |
 | `5h` | 5 小时限额：进度条 + 已用百分比 + 距离重置的剩余时长 |
 | `week` | 每周限额：进度条 + 已用百分比 + 距离重置的剩余时长 |
 
 - **进度条**：宽 8 格，每格再细分 8 阶（`▏▎▍▌▋▊▉█`），共 64 阶，精度约 1.6%。
 - **颜色**：已用低于 50% 为绿色，50% 起为黄色，80% 起为红色。
+- **上下文**：已用量按离自动压缩阈值的远近上色，阈值同上。Claude Code 不会把阈值传给脚本，所以脚本按 Claude Code 的算法自己算：上下文总量 − 20k 输出预留 − 13k 缓冲（200k 窗口为 167k，1M 窗口为 967k）。同时会读取 `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`、`CLAUDE_CODE_AUTO_COMPACT_WINDOW`、`CLAUDE_CODE_MAX_OUTPUT_TOKENS`、`DISABLE_AUTO_COMPACT` 这几个环境变量，以及 `~/.claude/settings.json` 里的 `autoCompactEnabled`。
 - **剩余时长格式**：超过 1 天为 `3d18h`，不足 1 天为 `2h01m`，不足 1 小时为 `45m`，已到期为 `now`。
 
 ## 环境要求
@@ -67,6 +69,7 @@ echo '{"model":{"display_name":"Opus 5.5"},"effort":{"level":"high"},"rate_limit
 打开 `statusline.py` 修改：
 
 - `BAR_WIDTH`：进度条宽度（格数）
+- `autocompact_threshold()`：自动压缩阈值的计算方式；如果以后 Claude Code 改了算法，改这里
 - `pct_color()`：颜色阈值
 - `main()` 中的 `sep`：各项之间的分隔符
 - `main()` 中的 `parts`：显示哪些项目以及顺序
