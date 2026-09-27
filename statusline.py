@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Claude Code status line: model · effort · context · 5h usage + reset · weekly usage + reset."""
+"""Claude Code status line: model · effort · context · cost · 5h usage + reset · weekly usage + reset."""
 import json
 import os
 import sys
@@ -129,6 +129,13 @@ def context_segment(cw):
     return f"ctx {color}{fmt_tokens(used)}{RESET}/{limit_txt}{DIM}({fmt_tokens(size)}){RESET}"
 
 
+def cost_segment(cost):
+    usd = cost.get("total_cost_usd")
+    if not isinstance(usd, (int, float)):
+        return f"cost {DIM}--{RESET}"
+    return f"cost {YELLOW}${usd:.2f}{RESET}"
+
+
 def main():
     try:
         data = json.load(sys.stdin)
@@ -146,6 +153,7 @@ def main():
         f"{CYAN}{model}{RESET}",
         f"{MAGENTA}⚡{effort}{RESET}",
         context_segment(data.get("context_window") or {}),
+        cost_segment(data.get("cost") or {}),
         limit_segment("5h", rl.get("five_hour")),
         limit_segment("week", rl.get("seven_day")),
     ]

@@ -2,10 +2,10 @@
 
 [English](README.md) | **简体中文**
 
-一个自定义的 [Claude Code](https://claude.com/claude-code) 底部状态栏，显示当前模型、思考强度，以及订阅套餐的 5 小时与每周限额用量（带进度条和重置倒计时）。
+一个自定义的 [Claude Code](https://claude.com/claude-code) 底部状态栏，显示当前模型、思考强度、上下文占用、会话花费，以及订阅套餐的 5 小时与每周限额用量（带进度条和重置倒计时）。
 
 ```
-Opus 5.5 · ⚡high · ctx 45.2k/167k(200k) · 5h ▕███     ▏ 37% ↻ 2h01m · week ▕██████▌ ▏ 82% ↻ 3d18h
+Opus 5.5 · ⚡high · ctx 45.2k/167k(200k) · cost $3.46 · 5h ▕███     ▏ 37% ↻ 2h01m · week ▕██████▌ ▏ 82% ↻ 3d18h
 ```
 
 ## 显示内容
@@ -15,6 +15,7 @@ Opus 5.5 · ⚡high · ctx 45.2k/167k(200k) · 5h ▕███     ▏ 37% ↻ 2
 | 模型 | 当前使用的模型名称，如 `Opus 5.5` |
 | 思考强度 | 当前的 effort 等级，如 `⚡high`；关闭思考时显示 `thinking off`，没有等级时显示 `default` |
 | `ctx` | 上下文占用，格式为 `已用/自动压缩阈值(上下文总量)`，如 `45.2k/167k(200k)`；关闭自动压缩时中间显示 `off` |
+| `cost` | 当前会话累计花费（美元），如 `$3.46`，取自 Claude Code 的 `cost.total_cost_usd`。用 Pro / Max 订阅时，这是按 API 价格估算的数字，并不是实际扣的钱 |
 | `5h` | 5 小时限额：进度条 + 已用百分比 + 距离重置的剩余时长 |
 | `week` | 每周限额：进度条 + 已用百分比 + 距离重置的剩余时长 |
 
@@ -76,4 +77,4 @@ echo '{"model":{"display_name":"Opus 5.5"},"effort":{"level":"high"},"rate_limit
 
 ## 工作原理
 
-Claude Code 每次刷新状态栏时，会通过 stdin 向脚本传入一段 JSON（包含 `model`、`effort`、`rate_limits` 等字段），脚本把它格式化后输出一行文本，这一行就是状态栏的内容。`resets_at` 同时支持 Unix 时间戳和 ISO 8601 字符串。
+Claude Code 每次刷新状态栏时，会通过 stdin 向脚本传入一段 JSON（包含 `model`、`effort`、`context_window`、`cost`、`rate_limits` 等字段），脚本把它格式化后输出一行文本，这一行就是状态栏的内容。`resets_at` 同时支持 Unix 时间戳和 ISO 8601 字符串。

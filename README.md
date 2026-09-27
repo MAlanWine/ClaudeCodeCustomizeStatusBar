@@ -2,10 +2,10 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-A custom status line for [Claude Code](https://claude.com/claude-code) that shows the current model, the thinking effort level, and your subscription's 5-hour and weekly usage limits, each with a progress bar and a countdown to the next reset.
+A custom status line for [Claude Code](https://claude.com/claude-code) that shows the current model, the thinking effort level, context usage, session cost, and your subscription's 5-hour and weekly usage limits, each with a progress bar and a countdown to the next reset.
 
 ```
-Opus 5.5 · ⚡high · ctx 45.2k/167k(200k) · 5h ▕███     ▏ 37% ↻ 2h01m · week ▕██████▌ ▏ 82% ↻ 3d18h
+Opus 5.5 · ⚡high · ctx 45.2k/167k(200k) · cost $3.46 · 5h ▕███     ▏ 37% ↻ 2h01m · week ▕██████▌ ▏ 82% ↻ 3d18h
 ```
 
 ## What it shows
@@ -15,6 +15,7 @@ Opus 5.5 · ⚡high · ctx 45.2k/167k(200k) · 5h ▕███     ▏ 37% ↻ 2
 | Model | Name of the current model, e.g. `Opus 5.5` |
 | Effort | Current effort level, e.g. `⚡high`; shows `thinking off` when thinking is disabled and `default` when no level is set |
 | `ctx` | Context usage as `used/auto-compact threshold(context window size)`, e.g. `45.2k/167k(200k)`. The middle number shows `off` when auto-compact is disabled |
+| `cost` | Total cost of the current session in US dollars, e.g. `$3.46`, from Claude Code's `cost.total_cost_usd`. On a Pro or Max subscription this is an estimate at API prices, not money you're actually charged |
 | `5h` | 5-hour limit: progress bar, percent used, and time left until reset |
 | `week` | Weekly limit: progress bar, percent used, and time left until reset |
 
@@ -76,4 +77,4 @@ Edit these in `statusline.py`:
 
 ## How it works
 
-Each time Claude Code refreshes the status line, it sends the script a JSON object on stdin with fields such as `model`, `effort` and `rate_limits`. The script prints one line of text, and that line becomes the status line. `resets_at` can be either a Unix timestamp or an ISO 8601 string.
+Each time Claude Code refreshes the status line, it sends the script a JSON object on stdin with fields such as `model`, `effort`, `context_window`, `cost` and `rate_limits`. The script prints one line of text, and that line becomes the status line. `resets_at` can be either a Unix timestamp or an ISO 8601 string.
